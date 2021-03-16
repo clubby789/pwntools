@@ -2,6 +2,8 @@ use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
 use std::net::TcpStream;
+use crate::logging::log;
+use crate::logging::LogLevel::Info;
 
 pub struct Remote {
     sock: Sock,
@@ -13,6 +15,7 @@ impl Remote {
     pub fn remote<T: ToString, T2: Into<i32>>(host: T, port: T2) -> Self {
         let port = port.into();
         let conn_str = format!("{}:{}", host.to_string(), port);
+        log(format!("Opening connection to {}", conn_str), Info);
         Remote {
             sock: Sock::new(TcpStream::connect(conn_str).expect("Could not connect")),
             _host: host.to_string(),
