@@ -1,0 +1,5 @@
+[package]
+name = "pwntools"
+version = "0.1.0"
+authors = ["clubby789 <jamie@hill-daniel.co.uk>"]
+edition = "2018"
