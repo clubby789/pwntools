@@ -10,7 +10,7 @@ fn echo_sock() {
     let mut sock = Remote::remote("tcpbin.com", 4242);
     let data = b"test";
     sock.sendline(*data);
-    let returned: &[u8] = &sock.recv(None);
+    let returned: &[u8] = &sock.recv();
     // Cut out the returned newline
     assert_eq!(returned[..4], data[..])
 }
@@ -25,5 +25,5 @@ fn listen_sock() {
         let mut sock = Remote::remote("127.0.0.1", addr.port());
         sock.send(*b"test");
     });
-    assert_eq!(listener.recv(None), b"test");
+    assert_eq!(listener.recv(), b"test");
 }

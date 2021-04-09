@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 colored = "2.0.0"
+byteorder = "1.4.3"
