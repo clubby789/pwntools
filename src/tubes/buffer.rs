@@ -1,6 +1,8 @@
 use std::collections::VecDeque;
 
-/// List of strings with some helper routines
+/// List of strings with some helper routines.
+///
+/// Used as the backing store for the `Tube` structs
 pub struct Buffer {
     /// A queue of `u8` (oldest is at the start)
     pub data: VecDeque<u8>,
@@ -26,12 +28,23 @@ impl Buffer {
         self.size += data.len();
         self.data.extend(data);
     }
-    /// Retrieve max `size` bytes from the buffer. If `size` is `None`, get infinite.
-    pub fn get(&mut self, size: Option<usize>) -> Vec<u8> {
-        match size {
-            Some(sz) if (sz > self.size || sz == 0) => self.data.drain(..).collect(),
-            Some(sz) if sz <= self.size => self.data.drain(0..sz).collect(),
-            _ => self.data.drain(..).collect(),
+    /// Receive bytes from the buffer.
+    ///
+    /// * `numb` - The maximum bytes to retrieve. If 0, unlimited.
+    pub fn get(&mut self, numb: usize) -> Vec<u8> {
+        if numb > self.size || numb == 0 {
+            self.data.drain(..).collect()
+        } else if numb <= self.size {
+            self.data.drain(0..numb).collect()
+        } else {
+            self.data.drain(..).collect()
+        }
+    }
+    /// Place data at the front of the buffer.
+    pub fn unget(&mut self, data: Vec<u8>) {
+        self.size += data.len();
+        for item in data.iter().rev() {
+            self.data.push_back(*item);
         }
     }
 }

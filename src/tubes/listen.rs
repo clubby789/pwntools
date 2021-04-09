@@ -2,7 +2,16 @@ use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
 use std::net::{SocketAddr, TcpListener};
+use std::time::Duration;
 
+/// A TCP listener which is connected to a [`Sock`]
+///
+/// # Example
+/// Listen on all interfaces, on an OS-selected TCP port
+/// ```
+/// use pwntools::tubes::listen::Listen;
+/// let mut listener = Listen::listen(Some("0.0.0.0"), None);
+/// ```
 pub struct Listen {
     listener: TcpListener,
     sock: Option<Sock>,
@@ -10,6 +19,8 @@ pub struct Listen {
 }
 
 impl Listen {
+    /// Create a TCP listener. By default, it will listen on all interfaces, and
+    /// a port randomly chosen by the OS.
     pub fn listen<T: ToString>(host: Option<T>, port: Option<i32>) -> Self {
         let host = match host {
             Some(h) => h.to_string(),
@@ -29,6 +40,7 @@ impl Listen {
         }
     }
 
+    /// Retrieve the internal `SocketAddr` of the listener.
     pub fn addr(&self) -> SocketAddr {
         self.listener
             .local_addr()
@@ -37,18 +49,6 @@ impl Listen {
 }
 
 impl Tube for Listen {
-    fn fill_buffer(&mut self) {
-        if let None = self.sock {
-            self.sock = Some(Sock::new(
-                self.listener
-                    .accept()
-                    .expect("Could not accept connection")
-                    .0,
-            ));
-        }
-        self.sock.as_mut().unwrap().fill_buffer();
-    }
-
     fn get_buffer(&mut self) -> &mut Buffer {
         if let None = self.sock {
             self.sock = Some(Sock::new(
@@ -59,6 +59,18 @@ impl Tube for Listen {
             ));
         }
         self.sock.as_mut().unwrap().get_buffer()
+    }
+
+    fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
+        if let None = self.sock {
+            self.sock = Some(Sock::new(
+                self.listener
+                    .accept()
+                    .expect("Could not accept connection")
+                    .0,
+            ));
+        }
+        self.sock.as_mut().unwrap().fill_buffer(timeout)
     }
 
     fn send_raw(&mut self, data: Vec<u8>) {

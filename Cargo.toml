@@ -3,3 +3,7 @@ name = "pwntools"
 version = "0.1.0"
 authors = ["clubby789 <jamie@hill-daniel.co.uk>"]
 edition = "2018"
+
+[dependencies]
+colored = "2.0.0"
+byteorder = "1.4.3"
