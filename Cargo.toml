@@ -8,6 +8,7 @@ repository = "https://github.com/clubby789/pwntools"
 homepage = "https://github.com/clubby789/pwntools"
 readme = "README.md"
 license = "MIT"
+include = ["src/**/*", "README.md"]
 
 [dependencies]
 colored = "2.0.0"
