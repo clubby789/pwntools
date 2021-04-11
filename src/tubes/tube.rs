@@ -74,6 +74,22 @@ pub trait Tube {
     /// Close both ends of the `Tube`.
     fn close(&mut self);
 
+    /// Receive until the given delimiter is received.
+    fn recvuntil(&mut self, delim: &[u8]) -> Vec<u8> {
+        let mut pos;
+        loop {
+            self.fill_buffer(Some(Duration::from_millis(50)));
+            pos = find_subsequence(&self.get_buffer().data.make_contiguous(), delim.clone());
+            if let Some(p) = pos {
+                return self.get_buffer().get(p + 1);
+            }
+        }
+    }
+
+    /// Receive from the tube until a newline is received.
+    fn recvline(&mut self) -> Vec<u8> {
+        self.recvuntil(b"\n")
+    }
     fn interactive(&mut self)
     where
         Self: Clone+Send,
@@ -97,4 +113,8 @@ pub trait Tube {
         }
         }).unwrap();
     }
+}
+
+fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    haystack.windows(needle.len()).position(|window| window == needle)
 }
