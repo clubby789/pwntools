@@ -1,8 +1,8 @@
-use pwntools::context::{
+use pwntools_rs::context::{
     context,
     Endianness::{Big, Little},
 };
-use pwntools::util::packing::*;
+use pwntools_rs::util::packing::*;
 
 /// Test the basic packing of unsigned integers
 #[test]

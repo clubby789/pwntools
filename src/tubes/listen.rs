@@ -9,7 +9,7 @@ use std::time::Duration;
 /// # Example
 /// Listen on all interfaces, on an OS-selected TCP port
 /// ```
-/// use pwntools::tubes::listen::Listen;
+/// use pwntools_rs::tubes::listen::Listen;
 /// let mut listener = Listen::listen(Some("0.0.0.0"), None);
 /// ```
 pub struct Listen {

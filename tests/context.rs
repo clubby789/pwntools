@@ -1,6 +1,6 @@
-use pwntools::context::Bits::SixtyFour;
-use pwntools::context::Endianness::Little;
-use pwntools::context::{context, AMD64, I386};
+use pwntools_rs::context::Bits::SixtyFour;
+use pwntools_rs::context::Endianness::Little;
+use pwntools_rs::context::{context, AMD64, I386};
 
 /// Test `Context`
 #[test]

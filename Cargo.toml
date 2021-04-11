@@ -1,12 +1,16 @@
 [package]
-name = "pwntools"
+name = "pwntools-rs"
 version = "0.1.0"
 authors = ["clubby789 <jamie@hill-daniel.co.uk>"]
+description = "An implementation of Pwntools written in Rust."
 edition = "2018"
+repository = "https://github.com/clubby789/pwntools"
+homepage = "https://github.com/clubby789/pwntools"
+readme = "README.md"
+license = "MIT"
 
 [dependencies]
 colored = "2.0.0"
 byteorder = "1.4.3"
 rustyline = "8.0.0"
-crossbeam = "0.8.0"
 crossbeam-utils = "0.8.3"
