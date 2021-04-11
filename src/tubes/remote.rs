@@ -16,6 +16,7 @@ use std::time::Duration;
 /// let data = b"test";
 /// sock.sendline(*data);
 /// ```
+#[derive(Clone)]
 pub struct Remote {
     sock: Sock,
     _host: String,
@@ -24,7 +25,7 @@ pub struct Remote {
 
 impl Remote {
     /// Create a TCP client connection.
-    pub fn remote<T: ToString, T2: Into<i32>>(host: T, port: T2) -> Self {
+    pub fn remote<T: ToString, T2: Into<i32>>(host: T, port: T2) -> Remote {
         let port = port.into();
         let conn_str = format!("{}:{}", host.to_string(), port);
         log(format!("Opening connection to {}", conn_str), Info);

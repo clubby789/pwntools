@@ -32,12 +32,15 @@ impl Tube for Sock {
         loop {
             let read = self
                 .sock
-                .read(&mut temp_buf)
-                .expect("Could not read from socket");
+                .read(&mut temp_buf);
             let buffer = self.get_buffer();
-            buffer.add(temp_buf[..read].to_vec());
-            total += read;
-            if read < 1024 {
+            if let Ok(sz) = read {
+                buffer.add(temp_buf[..sz].to_vec());
+                total += sz;
+                if sz < 1024 {
+                    break;
+                }
+            } else {
                 break;
             }
         }
@@ -52,5 +55,14 @@ impl Tube for Sock {
         self.sock
             .shutdown(Shutdown::Both)
             .expect("Could not shut down socket");
+    }
+}
+
+impl Clone for Sock {
+    fn clone(&self) -> Self {
+        Sock {
+            sock: self.sock.try_clone().unwrap(),
+            buffer: self.buffer.clone()
+        }
     }
 }
