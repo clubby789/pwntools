@@ -21,10 +21,11 @@ impl Sock {
 }
 
 impl Tube for Sock {
+    /// Get a mutable reference to the internal [`Buffer`].
     fn get_buffer(&mut self) -> &mut Buffer {
         &mut self.buffer
     }
-
+    /// Attempt to fill the internal [`Buffer`] with a given timeout.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
         self.sock.set_read_timeout(timeout).unwrap();
         let mut temp_buf: [u8; 1024] = [0; 1024];
@@ -46,11 +47,12 @@ impl Tube for Sock {
         }
         total
     }
-
+    /// Send data via the [`Sock`].
     fn send_raw(&mut self, data: Vec<u8>) {
         self.sock.write(&data).expect("Could not write to socket");
     }
 
+    /// Close the internal [`Sock`].
     fn close(&mut self) {
         self.sock
             .shutdown(Shutdown::Both)

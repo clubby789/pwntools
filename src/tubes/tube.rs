@@ -90,6 +90,8 @@ pub trait Tube {
     fn recvline(&mut self) -> Vec<u8> {
         self.recvuntil(b"\n")
     }
+    /// Get an interactive prompt for the connection. A second thread will print messages as they
+    /// arrive.
     fn interactive(&mut self)
     where
         Self: Clone+Send,

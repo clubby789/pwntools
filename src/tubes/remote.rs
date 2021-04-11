@@ -38,18 +38,19 @@ impl Remote {
 }
 
 impl Tube for Remote {
+    /// Get a mutable reference to the [`Sock`]'s internal [`Buffer`].
     fn get_buffer(&mut self) -> &mut Buffer {
         self.sock.get_buffer()
     }
-
+    /// Attempt to fill the [`Sock`]'s internal [`Buffer`] with a given timeout.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
         self.sock.fill_buffer(timeout)
     }
-
+    /// Send data via the [`Sock`].
     fn send_raw(&mut self, data: Vec<u8>) {
         self.sock.send(data)
     }
-
+    /// Close the internal [`Sock`].
     fn close(&mut self) {
         self.sock.close();
     }

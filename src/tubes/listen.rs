@@ -49,6 +49,8 @@ impl Listen {
 }
 
 impl Tube for Listen {
+    /// Retrieve a mutable reference to the [`Sock`]'s internal [`Buffer`]. On first call,
+    /// will block until a connection is received.
     fn get_buffer(&mut self) -> &mut Buffer {
         if let None = self.sock {
             self.sock = Some(Sock::new(
@@ -61,6 +63,8 @@ impl Tube for Listen {
         self.sock.as_mut().unwrap().get_buffer()
     }
 
+    /// Fill the [`Sock`]'s internal [`Buffer`]. On first call, will block until
+    /// a connection is received.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
         if let None = self.sock {
             self.sock = Some(Sock::new(
@@ -73,6 +77,8 @@ impl Tube for Listen {
         self.sock.as_mut().unwrap().fill_buffer(timeout)
     }
 
+    /// Send a message via the [`Sock`]. On first call, will block until
+    /// a connection is received.
     fn send_raw(&mut self, data: Vec<u8>) {
         if let None = self.sock {
             self.sock = Some(Sock::new(
@@ -85,6 +91,7 @@ impl Tube for Listen {
         self.sock.as_mut().unwrap().send(data)
     }
 
+    /// Close the internal [`Sock`].
     fn close(&mut self) {
         if let Some(sock) = &mut self.sock {
             sock.close();
