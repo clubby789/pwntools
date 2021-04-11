@@ -1,3 +1,7 @@
+extern crate rustyline;
+use rustyline::Editor;
+extern crate crossbeam_utils;
+use crossbeam_utils::thread;
 use crate::logging::*;
 use crate::tubes::buffer::Buffer;
 use std::time::Duration;
@@ -10,6 +14,9 @@ pub trait Tube {
     ///
     /// * `timeout` - Maximum time to fill for. If `None`, block until data is read.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize;
+
+
+    // Currently not working. Gives a timeout message.
     /// Retrieve all data from the `Tube`.
     ///
     /// * `timeout` - The maximum time to read for, defaults to 0.05s. If 0, clean only the
@@ -17,13 +24,15 @@ pub trait Tube {
     fn clean(&mut self, timeout: Option<Duration>) -> Vec<u8> {
         let timeout = match timeout {
             Some(t) => t,
-            None => Duration::from_millis(50),
+            None => Duration::from_millis(100),
         };
         if timeout == Duration::from_millis(0) {
             return self.get_buffer().get(0);
         }
         self.recvrepeat(Some(timeout))
     }
+
+
     /// Receives from the `Tube`, returning once any data is available.
     fn recv(&mut self) -> Vec<u8> {
         self._recv(None, None)
@@ -64,4 +73,28 @@ pub trait Tube {
     fn send_raw(&mut self, data: Vec<u8>);
     /// Close both ends of the `Tube`.
     fn close(&mut self);
+
+    fn interactive(&mut self)
+    where
+        Self: Clone+Send,
+    {
+        let mut receiver = self.clone();
+        // Make sure that the receiver thread does not outlive scope
+        thread::scope(|s| {
+            s.spawn(|_| {
+                loop {
+                    print!("{}", std::str::from_utf8(&receiver.clean(None)).unwrap());
+                }
+            });
+
+        let mut rl = Editor::<()>::new();
+        loop {
+            if let Ok(line) = rl.readline("$ ") {
+                self.sendline(line);
+            } else {
+                return;
+            }
+        }
+        }).unwrap();
+    }
 }

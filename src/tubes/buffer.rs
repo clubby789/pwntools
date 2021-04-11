@@ -3,6 +3,7 @@ use std::collections::VecDeque;
 /// List of strings with some helper routines.
 ///
 /// Used as the backing store for the `Tube` structs
+#[derive(Clone)]
 pub struct Buffer {
     /// A queue of `u8` (oldest is at the start)
     pub data: VecDeque<u8>,

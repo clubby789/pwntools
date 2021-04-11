@@ -7,3 +7,6 @@ edition = "2018"
 [dependencies]
 colored = "2.0.0"
 byteorder = "1.4.3"
+rustyline = "8.0.0"
+crossbeam = "0.8.0"
+crossbeam-utils = "0.8.3"
