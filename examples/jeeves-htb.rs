@@ -1,7 +1,7 @@
-extern crate pwntools_rs;
-use pwntools_rs::tubes::remote::Remote;
-use pwntools_rs::tubes::tube::Tube;
-use pwntools_rs::util::packing::p64;
+extern crate pwn;
+use pwn::tubes::remote::Remote;
+use pwn::tubes::tube::Tube;
+use pwn::util::packing::p64;
 
 // Solving https://app.hackthebox.eu/challenges/Jeeves.
 // A simple buffer overflow and stack variable rewrite.

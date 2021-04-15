@@ -24,7 +24,7 @@ pub enum LogLevel {
 ///
 /// # Examples
 /// ```
-/// use pwntools_rs::logging::{log, LogLevel};
+/// use pwn::logging::{log, LogLevel};
 /// log("Something went wrong", LogLevel::Error);
 /// ```
 pub fn log<T: Display>(message: T, level: LogLevel) {

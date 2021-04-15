@@ -10,8 +10,8 @@ use std::time::Duration;
 ///
 /// # Examples
 /// ```
-/// use pwntools_rs::tubes::remote::Remote;
-/// use pwntools_rs::tubes::tube::Tube;
+/// use pwn::tubes::remote::Remote;
+/// use pwn::tubes::tube::Tube;
 /// let mut sock = Remote::remote("tcpbin.com", 4242);
 /// let data = b"test";
 /// sock.sendline(*data);

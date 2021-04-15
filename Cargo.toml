@@ -1,5 +1,5 @@
 [package]
-name = "pwntools-rs"
+name = "pwn"
 version = "0.1.0"
 authors = ["clubby789 <jamie@hill-daniel.co.uk>"]
 description = "An implementation of Pwntools written in Rust."

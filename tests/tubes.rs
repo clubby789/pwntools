@@ -1,6 +1,6 @@
-use pwntools_rs::tubes::listen::Listen;
-use pwntools_rs::tubes::remote::Remote;
-use pwntools_rs::tubes::tube::Tube;
+use pwn::tubes::listen::Listen;
+use pwn::tubes::remote::Remote;
+use pwn::tubes::tube::Tube;
 use std::time::Duration;
 
 /// Test ability to write to a TCP echo server and read the result.
