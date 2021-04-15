@@ -1,4 +1,5 @@
-# pwntools-rs
+![crates.io](https://img.shields.io/crates/v/pwn.svg)
+
 ## What is this?
 A minimal implementation of [Pwntools](https://github.com/gallopsled/pwntools) written in Rust.
 
