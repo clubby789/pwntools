@@ -12,4 +12,4 @@ Why not?
  - Packing/Unpacking of integers/bytes
 
 ## Examples
-Usage examples can be found in the [examples](examples) directory, including solutions for retired pwn challenges from Hack THe Box.
+Usage examples can be found in the [examples](examples) directory, including solutions for retired pwn challenges from Hack The Box.
