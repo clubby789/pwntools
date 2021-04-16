@@ -31,9 +31,7 @@ impl Tube for Sock {
         let mut temp_buf: [u8; 1024] = [0; 1024];
         let mut total: usize = 0;
         loop {
-            let read = self
-                .sock
-                .read(&mut temp_buf);
+            let read = self.sock.read(&mut temp_buf);
             let buffer = self.get_buffer();
             if let Ok(sz) = read {
                 buffer.add(temp_buf[..sz].to_vec());
@@ -64,7 +62,7 @@ impl Clone for Sock {
     fn clone(&self) -> Self {
         Sock {
             sock: self.sock.try_clone().unwrap(),
-            buffer: self.buffer.clone()
+            buffer: self.buffer.clone(),
         }
     }
 }

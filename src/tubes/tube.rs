@@ -1,9 +1,9 @@
 extern crate rustyline;
 use rustyline::Editor;
 extern crate crossbeam_utils;
-use crossbeam_utils::thread;
 use crate::logging::*;
 use crate::tubes::buffer::Buffer;
+use crossbeam_utils::thread;
 use std::time::Duration;
 
 /// Generic `Tube` trait
@@ -14,7 +14,6 @@ pub trait Tube {
     ///
     /// * `timeout` - Maximum time to fill for. If `None`, block until data is read.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize;
-
 
     // Currently not working. Gives a timeout message.
     /// Retrieve all data from the `Tube`.
@@ -31,7 +30,6 @@ pub trait Tube {
         }
         self.recvrepeat(Some(timeout))
     }
-
 
     /// Receives from the `Tube`, returning once any data is available.
     fn recv(&mut self) -> Vec<u8> {
@@ -94,29 +92,30 @@ pub trait Tube {
     /// arrive.
     fn interactive(&mut self)
     where
-        Self: Clone+Send,
+        Self: Clone + Send,
     {
         let mut receiver = self.clone();
         // Make sure that the receiver thread does not outlive scope
         thread::scope(|s| {
-            s.spawn(|_| {
-                loop {
-                    print!("{}", std::str::from_utf8(&receiver.clean(None)).unwrap());
-                }
+            s.spawn(|_| loop {
+                print!("{}", std::str::from_utf8(&receiver.clean(None)).unwrap());
             });
 
-        let mut rl = Editor::<()>::new();
-        loop {
-            if let Ok(line) = rl.readline("$ ") {
-                self.sendline(line);
-            } else {
-                return;
+            let mut rl = Editor::<()>::new();
+            loop {
+                if let Ok(line) = rl.readline("$ ") {
+                    self.sendline(line);
+                } else {
+                    return;
+                }
             }
-        }
-        }).unwrap();
+        })
+        .unwrap();
     }
 }
 
 fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    haystack.windows(needle.len()).position(|window| window == needle)
+    haystack
+        .windows(needle.len())
+        .position(|window| window == needle)
 }
