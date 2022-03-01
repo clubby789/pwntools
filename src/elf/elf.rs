@@ -165,7 +165,7 @@ impl<'a> Elf<'a> {
             .section_headers
             .iter()
             .find(|shdr| matches!(self.elf.shdr_strtab.get_at(shdr.sh_name), Some(".plt")))
-            .expect("Not .plt section");
+            .expect("No .plt section");
 
         let mut plt = HashMap::new();
         for (i, reloc) in self.elf.pltrelocs.iter().enumerate() {
