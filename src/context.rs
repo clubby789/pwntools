@@ -1,10 +1,12 @@
 //! The global context. Used to set global settings which are used internally by several functions.
-
 #![allow(dead_code)]
 use crate::context::Bits::{Eight, Sixteen, SixtyFour, ThirtyTwo};
 use crate::context::Endianness::{Big, Little};
 use crate::logging::LogLevel;
 use crate::logging::LogLevel::Info;
+
+use once_cell::sync::Lazy;
+use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Endianness {
@@ -113,33 +115,40 @@ pub struct Context {
     pub bits: Bits,
 }
 
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            arch: I386,
+            log_level: Info,
+            endian: Little,
+            bits: ThirtyTwo,
+        }
+    }
+}
+
 /** The default `Context`.
 * Arch: [`I386`],
 * Log Level: [`Info`],
 * Endianness: [`Little`],
 *  Bits: [`ThirtyTwo`]
 **/
-pub static mut CONTEXT: Context = Context {
-    arch: I386,
-    log_level: Info,
-    endian: Little,
-    bits: ThirtyTwo,
-};
+pub static CONTEXT: Lazy<RwLock<Context>> = Lazy::new(|| RwLock::new(Default::default()));
+
+/// Retrieves a static reference to the global `Context`.
+pub fn context() -> RwLockReadGuard<'static, Context> {
+    CONTEXT.read().unwrap()
+}
 
 /// Retrieves a mutable static reference to the global `Context`.
-///
-/// # Safety
-/// Mutable global statics are unsafe, so this provides a safe wrapper around it.
-/// Currently, thread safety is not implemented.
-pub fn context() -> &'static mut Context {
-    unsafe { &mut CONTEXT }
+pub fn context_mut() -> RwLockWriteGuard<'static, Context> {
+    CONTEXT.write().unwrap()
 }
 
 impl Context {
     /// Set the context's architecture and update the bits/endianness correspondingly
     pub fn set_arch(&mut self, a: Arch) {
-        context().arch = a;
-        context().bits = a.bits;
-        context().endian = a.endian;
+        self.arch = a;
+        self.bits = a.bits;
+        self.endian = a.endian;
     }
 }
