@@ -9,36 +9,29 @@ use goblin::elf::Elf as GoblinElf;
 use once_cell::sync::OnceCell;
 
 /// Wrapper around [`goblin::elf::Elf`]
-pub struct Elf {
+pub struct Elf<'a> {
     path: PathBuf,
-    elf: GoblinElf<'static>,
-    symbols: OnceCell<HashMap<&'static str, usize>>,
-    got: OnceCell<HashMap<&'static str, usize>>,
-    plt: OnceCell<HashMap<&'static str, usize>>,
+    elf: GoblinElf<'a>,
+    symbols: OnceCell<HashMap<&'a str, usize>>,
+    got: OnceCell<HashMap<&'a str, usize>>,
+    plt: OnceCell<HashMap<&'a str, usize>>,
     statically_linked: bool,
     #[allow(dead_code)]
     address: usize,
 }
 
-impl Elf {
+impl<'a> Elf<'a> {
     /// Create a new [`Elf`] loaded from a path
     ///
     /// *Note*: Due to a implementation detail, ELF files loaded have their memory leaked,
     /// so be careful of repeated loads.
     pub fn new(path: impl Into<PathBuf>) -> Self {
         let path = path.into();
-        Self::from_bytes(
-            std::fs::read(&path).expect("Could not open file"),
-            Some(path),
-        )
-    }
-
-    /// Initialize an [`Elf`] from raw bytes
-    pub fn from_bytes(data: Vec<u8>, path: Option<PathBuf>) -> Self {
-        // Goblin's Elf type holds a reference to its internal data. We can't have self-referential structs
-        // (without Pin) so here we `[Box::leak]` the parsed elf to turn it into a static reference
-        let data: &'static [u8] = Box::new(data).leak();
-        let internal = GoblinElf::parse(data).expect("Not a valid ELF file");
+        let mapped = Box::new(unsafe {
+            memmap::MmapOptions::new().map(&std::fs::File::open(&path).expect("Could not open file"))
+        }.expect("Could not mmap file"));
+        let mapped = Box::leak(mapped);
+        let internal = GoblinElf::parse(mapped).expect("Not a valid ELF file");
         let mut load_address = 0;
         if internal.header.e_type != ET_DYN {
             internal
@@ -62,7 +55,7 @@ impl Elf {
         }
 
         Self {
-            path: path.unwrap_or_else(|| "".into()),
+            path,
             elf: internal,
             symbols: Default::default(),
             got: Default::default(),
@@ -86,11 +79,11 @@ impl Elf {
     }
 
     /// A name->address mapping of the symbols in the ELF
-    pub fn symbols(&self) -> &HashMap<&'static str, usize> {
+    pub fn symbols(&self) -> &HashMap<&'a str, usize> {
         self.symbols.get_or_init(|| self.populate_symbols())
     }
     // Used to lazily populate the symbols map
-    fn populate_symbols(&self) -> HashMap<&'static str, usize> {
+    fn populate_symbols(&self) -> HashMap<&'a str, usize> {
         let mut syms = HashMap::new();
         for sym in &self.elf.syms {
             if sym.st_value == 0 {
@@ -126,11 +119,11 @@ impl Elf {
     }
 
     /// A name->address mapping of the GOT entries in the ELF
-    pub fn got(&self) -> &HashMap<&'static str, usize> {
+    pub fn got(&self) -> &HashMap<&'a str, usize> {
         self.got.get_or_init(|| self.populate_got())
     }
     // Used to lazily populate the GOT map
-    fn populate_got(&self) -> HashMap<&'static str, usize> {
+    fn populate_got(&self) -> HashMap<&'a str, usize> {
         if self.statically_linked {
             return Default::default();
         }
@@ -159,11 +152,11 @@ impl Elf {
     }
 
     /// A name->address mapping of the PLT entries in the ELF
-    pub fn plt(&self) -> &HashMap<&'static str, usize> {
+    pub fn plt(&self) -> &HashMap<&'a str, usize> {
         self.plt.get_or_init(|| self.populate_plt())
     }
     // Used to lazily populate the PLT map
-    fn populate_plt(&self) -> HashMap<&'static str, usize> {
+    fn populate_plt(&self) -> HashMap<&'a str, usize> {
         if self.statically_linked || self.got().is_empty() {
             return Default::default();
         }

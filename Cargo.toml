@@ -16,9 +16,11 @@ byteorder = "1.4.3"
 rustyline = "9.1.2"
 crossbeam-utils = "0.8.7"
 once_cell = "1.9.0"
-goblin = {version = "0.5.1", optional = true}
+
+goblin = {version = "0.5.1", optional = true, features = ["elf32", "elf64"]}
+memmap = {version = "0.7.0", optional = true}
 
 [features]
 default = ["tubes", "elf"]
 tubes = []
-elf = ["goblin"]
+elf = ["goblin", "memmap"]
