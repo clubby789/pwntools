@@ -49,7 +49,7 @@ impl Tube for Sock {
     }
     /// Send data via the [`Sock`].
     fn send_raw(&mut self, data: Vec<u8>) {
-        self.sock.write(&data).expect("Could not write to socket");
+        self.sock.write_all(&data).expect("Could not write to socket");
     }
 
     /// Close the internal [`Sock`].

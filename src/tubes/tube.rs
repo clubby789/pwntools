@@ -44,17 +44,12 @@ pub trait Tube {
 
     fn _recv(&mut self, numb: Option<usize>, timeout: Option<Duration>) -> Vec<u8> {
         self.fill_buffer(timeout);
-        let numb = match numb {
-            Some(sz) => sz,
-            None => 0,
-        };
+        let numb = numb.unwrap_or(0);
         self.get_buffer().get(numb)
     }
     /// Receive all data from the `Tube`, repeatedly reading with the given `timeout`.
     fn recvrepeat(&mut self, timeout: Option<Duration>) -> Vec<u8> {
-        while self.fill_buffer(timeout) > 0 {
-            ();
-        }
+        while self.fill_buffer(timeout) > 0 {}
         self.get_buffer().get(0)
     }
     /// Writes data to the `Tube`.
@@ -79,7 +74,7 @@ pub trait Tube {
         let mut pos;
         loop {
             self.fill_buffer(Some(Duration::from_millis(50)));
-            pos = find_subsequence(&self.get_buffer().data.make_contiguous(), delim.clone());
+            pos = find_subsequence(self.get_buffer().data.make_contiguous(), delim);
             if let Some(p) = pos {
                 return self.get_buffer().get(p + 1);
             }

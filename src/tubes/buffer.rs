@@ -11,17 +11,27 @@ pub struct Buffer {
     pub size: usize,
 }
 
+impl Default for Buffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Buffer {
     /// Initialize a `Buffer`
     pub fn new() -> Self {
         Self {
             data: VecDeque::<u8>::new(),
-            size: 0 as usize,
+            size: 0,
         }
     }
     /// Get the current `Buffer` length
     pub fn len(&self) -> usize {
         self.size
+    }
+    /// Check if `Buffer` is empty
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
     /// Adds new data to the buffer
     pub fn add(&mut self, data: Vec<u8>) {

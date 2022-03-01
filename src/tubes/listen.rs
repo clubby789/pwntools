@@ -10,7 +10,7 @@ use std::time::Duration;
 /// Listen on all interfaces, on an OS-selected TCP port
 /// ```
 /// use pwn::tubes::listen::Listen;
-/// let mut listener = Listen::listen(Some("0.0.0.0"), None);
+/// let mut listener = Listen::new(Some("0.0.0.0"), None);
 /// ```
 pub struct Listen {
     listener: TcpListener,
@@ -21,7 +21,7 @@ pub struct Listen {
 impl Listen {
     /// Create a TCP listener. By default, it will listen on all interfaces, and
     /// a port randomly chosen by the OS.
-    pub fn listen<T: ToString>(host: Option<T>, port: Option<i32>) -> Self {
+    pub fn new<T: ToString>(host: Option<T>, port: Option<i32>) -> Self {
         let host = match host {
             Some(h) => h.to_string(),
             None => "0.0.0.0".to_string(),
@@ -52,7 +52,7 @@ impl Tube for Listen {
     /// Retrieve a mutable reference to the [`Sock`]'s internal [`Buffer`]. On first call,
     /// will block until a connection is received.
     fn get_buffer(&mut self) -> &mut Buffer {
-        if let None = self.sock {
+        if self.sock.is_none() {
             self.sock = Some(Sock::new(
                 self.listener
                     .accept()
@@ -66,7 +66,7 @@ impl Tube for Listen {
     /// Fill the [`Sock`]'s internal [`Buffer`]. On first call, will block until
     /// a connection is received.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
-        if let None = self.sock {
+        if self.sock.is_none() {
             self.sock = Some(Sock::new(
                 self.listener
                     .accept()
@@ -80,7 +80,7 @@ impl Tube for Listen {
     /// Send a message via the [`Sock`]. On first call, will block until
     /// a connection is received.
     fn send_raw(&mut self, data: Vec<u8>) {
-        if let None = self.sock {
+        if self.sock.is_none() {
             self.sock = Some(Sock::new(
                 self.listener
                     .accept()

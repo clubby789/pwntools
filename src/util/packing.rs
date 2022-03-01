@@ -46,7 +46,7 @@ pub fn p64(v: u64) -> Result<Vec<u8>, io::Error> {
 /// Unpacks a 1 byte `Vec` to a `u8`
 pub fn u8(v: Vec<u8>) -> Result<u8, io::Error> {
     let mut res = Cursor::new(v);
-    Ok(res.read_u8()?)
+    res.read_u8()
 }
 
 /// Unpacks a 2 byte `Vec` to a `u16`

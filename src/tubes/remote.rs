@@ -12,7 +12,7 @@ use std::time::Duration;
 /// ```
 /// use pwn::tubes::remote::Remote;
 /// use pwn::tubes::tube::Tube;
-/// let mut sock = Remote::remote("tcpbin.com", 4242);
+/// let mut sock = Remote::new("tcpbin.com", 4242);
 /// let data = b"test";
 /// sock.sendline(*data);
 /// ```
@@ -25,7 +25,7 @@ pub struct Remote {
 
 impl Remote {
     /// Create a TCP client connection.
-    pub fn remote<T: ToString, T2: Into<i32>>(host: T, port: T2) -> Remote {
+    pub fn new<T: ToString, T2: Into<i32>>(host: T, port: T2) -> Remote {
         let port = port.into();
         let conn_str = format!("{}:{}", host.to_string(), port);
         log(format!("Opening connection to {}", conn_str), Info);
