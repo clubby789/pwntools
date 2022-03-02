@@ -22,9 +22,6 @@ pub struct Elf<'a> {
 
 impl<'a> Elf<'a> {
     /// Create a new [`Elf`] loaded from a path
-    ///
-    /// *Note*: Due to a implementation detail, ELF files loaded have their memory leaked,
-    /// so be careful of repeated loads.
     pub fn new(path: impl Into<PathBuf>) -> Self {
         let path = path.into();
         let mapped = Box::new(unsafe {
