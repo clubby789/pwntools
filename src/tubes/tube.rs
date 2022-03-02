@@ -37,14 +37,15 @@ pub trait Tube {
 
     /// Receives from the `Tube`, returning once any data is available.
     fn recv(&mut self) -> io::Result<Vec<u8>> {
-        self._recv(None, None)
+        self.recv_raw(None, None)
     }
     /// Receives `n` bytes from the `Tube`.
     fn recvn(&mut self, n: usize) -> io::Result<Vec<u8>> {
-        self._recv(Some(n), None)
+        self.recv_raw(Some(n), None)
     }
 
-    fn _recv(&mut self, numb: Option<usize>, timeout: Option<Duration>) -> io::Result<Vec<u8>> {
+    #[doc(hidden)]
+    fn recv_raw(&mut self, numb: Option<usize>, timeout: Option<Duration>) -> io::Result<Vec<u8>> {
         self.fill_buffer(timeout)?;
         let numb = numb.unwrap_or(0);
         Ok(self.get_buffer().get(numb))
@@ -67,6 +68,8 @@ pub trait Tube {
         log_debug(format!("Sending {} bytes", data.len()));
         self.send_raw(data)
     }
+
+    #[doc(hidden)]
     fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()>;
     /// Close both ends of the `Tube`.
     fn close(&mut self) -> io::Result<()>;

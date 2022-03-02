@@ -1,21 +1,25 @@
 //! The global context. Used to set global settings which are used internally by several functions.
 #![allow(dead_code)]
-use crate::context::Bits::{Eight, Sixteen, SixtyFour, ThirtyTwo};
-use crate::context::Endianness::{Big, Little};
+use crate::context::Bits::{SixtyFour, ThirtyTwo};
+use crate::context::Endianness::Little;
 use crate::logging::LogLevel;
 use crate::logging::LogLevel::Info;
 
 use once_cell::sync::Lazy;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
+/// The word endianness of a given [`Arch`]
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
 pub enum Endianness {
     Little,
     Big,
 }
 
+/// The word size of a given [`Arch`]
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
+#[allow(missing_docs)]
 pub enum Bits {
     Eight = 8,
     Sixteen = 16,
@@ -24,90 +28,30 @@ pub enum Bits {
     OneTwentyEight = 128,
 }
 
+/// An architecture, identified by its endianness and word size
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
 pub struct Arch {
     pub endian: Endianness,
     pub bits: Bits,
 }
 
-pub const AARCH64: Arch = Arch {
-    endian: Little,
-    bits: SixtyFour,
-};
-pub const ALPHA: Arch = Arch {
-    endian: Little,
-    bits: SixtyFour,
-};
-pub const AVR: Arch = Arch {
-    endian: Little,
-    bits: Eight,
-};
+/// The 64-bit version of x86
 pub const AMD64: Arch = Arch {
     endian: Little,
     bits: SixtyFour,
 };
-pub const ARM: Arch = Arch {
-    endian: Little,
-    bits: ThirtyTwo,
-};
-pub const CRIS: Arch = Arch {
-    endian: Little,
-    bits: ThirtyTwo,
-};
+
+/// The 32-bit version of x86
 pub const I386: Arch = Arch {
     endian: Little,
     bits: ThirtyTwo,
 };
-pub const IA64: Arch = Arch {
-    endian: Big,
-    bits: SixtyFour,
-};
-pub const M68K: Arch = Arch {
-    endian: Big,
-    bits: ThirtyTwo,
-};
-pub const MIPS: Arch = Arch {
-    endian: Little,
-    bits: ThirtyTwo,
-};
-pub const MIPS64: Arch = Arch {
-    endian: Little,
-    bits: SixtyFour,
-};
-pub const MSP430: Arch = Arch {
-    endian: Little,
-    bits: Sixteen,
-};
-pub const POWERPC: Arch = Arch {
-    endian: Big,
-    bits: ThirtyTwo,
-};
-pub const POWERPC64: Arch = Arch {
-    endian: Big,
-    bits: SixtyFour,
-};
-pub const S390: Arch = Arch {
-    endian: Big,
-    bits: ThirtyTwo,
-};
-pub const SPARC: Arch = Arch {
-    endian: Big,
-    bits: ThirtyTwo,
-};
-pub const SPARC64: Arch = Arch {
-    endian: Big,
-    bits: SixtyFour,
-};
-pub const THUMB: Arch = Arch {
-    endian: Little,
-    bits: ThirtyTwo,
-};
-pub const VAX: Arch = Arch {
-    endian: Little,
-    bits: ThirtyTwo,
-};
 
+/// The current context, used by most functions for runtime
+/// behaviour modification
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
 pub struct Context {
     pub arch: Arch,
     pub log_level: LogLevel,

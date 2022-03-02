@@ -15,8 +15,11 @@ use std::time::Duration;
 /// let mut listener = Listen::new(Some("0.0.0.0"), None);
 /// ```
 pub struct Listen {
+    /// The TCP listener we bound to
     listener: TcpListener,
+    /// The TCP socket opened for communication
     sock: OnceCell<Sock>,
+    /// The [`SocketAddr`] we're listening on
     pub addr: SocketAddr,
 }
 

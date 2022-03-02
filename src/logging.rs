@@ -2,12 +2,12 @@
 use crate::context::context;
 use std::fmt::Display;
 
-extern crate colored;
-use self::colored::ColoredString;
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 
+/// Iterative log levels for filtering
 #[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
 #[repr(u8)]
+#[allow(missing_docs)]
 pub enum LogLevel {
     Debug = 0,
     Info = 1,

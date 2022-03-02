@@ -1,6 +1,7 @@
 //! An implementation of [Pwntools](https://github.com/Gallopsled/pwntools/) written in Rust
 //!
 //! Pwntools is a collection of tools and utilities designed to assist with a variety of exploitation.
+#![warn(missing_docs)]
 
 pub mod context;
 pub use context::*;
