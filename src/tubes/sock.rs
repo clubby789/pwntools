@@ -1,3 +1,4 @@
+use std::io;
 use crate::tubes::buffer::Buffer;
 use crate::tubes::tube::Tube;
 use std::io::{Read, Write};
@@ -26,30 +27,25 @@ impl Tube for Sock {
         &mut self.buffer
     }
     /// Attempt to fill the internal [`Buffer`] with a given timeout.
-    fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
-        self.sock.set_read_timeout(timeout).unwrap();
+    fn fill_buffer(&mut self, timeout: Option<Duration>) -> io::Result<usize> {
+        self.sock.set_read_timeout(timeout)?;
         let mut temp_buf: [u8; 1024] = [0; 1024];
         let mut total: usize = 0;
         loop {
-            let read = self.sock.read(&mut temp_buf);
+            let read = self.sock.read(&mut temp_buf)?;
             let buffer = self.get_buffer();
-            if let Ok(sz) = read {
-                buffer.add(temp_buf[..sz].to_vec());
-                total += sz;
-                if sz < 1024 {
-                    break;
-                }
-            } else {
+            buffer.add(temp_buf[..read].to_vec());
+            total += read;
+            if read < 1024 {
                 break;
             }
-        }
-        total
+            }
+        Ok(total)
     }
     /// Send data via the [`Sock`].
-    fn send_raw(&mut self, data: Vec<u8>) {
+    fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()> {
         self.sock
             .write_all(&data)
-            .expect("Could not write to socket");
     }
 
     /// Close the internal [`Sock`].

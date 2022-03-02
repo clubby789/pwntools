@@ -1,3 +1,4 @@
+use std::io;
 use crate::logging::log;
 use crate::logging::LogLevel::Info;
 use crate::tubes::buffer::Buffer;
@@ -43,11 +44,11 @@ impl Tube for Remote {
         self.sock.get_buffer()
     }
     /// Attempt to fill the [`Sock`]'s internal [`Buffer`] with a given timeout.
-    fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
+    fn fill_buffer(&mut self, timeout: Option<Duration>) -> io::Result<usize> {
         self.sock.fill_buffer(timeout)
     }
     /// Send data via the [`Sock`].
-    fn send_raw(&mut self, data: Vec<u8>) {
+    fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()> {
         self.sock.send(data)
     }
     /// Close the internal [`Sock`].

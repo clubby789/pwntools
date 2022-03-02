@@ -1,3 +1,4 @@
+use std::io;
 use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
@@ -65,7 +66,7 @@ impl Tube for Listen {
 
     /// Fill the [`Sock`]'s internal [`Buffer`]. On first call, will block until
     /// a connection is received.
-    fn fill_buffer(&mut self, timeout: Option<Duration>) -> usize {
+    fn fill_buffer(&mut self, timeout: Option<Duration>) -> io::Result<usize> {
         if self.sock.is_none() {
             self.sock = Some(Sock::new(
                 self.listener
@@ -79,7 +80,7 @@ impl Tube for Listen {
 
     /// Send a message via the [`Sock`]. On first call, will block until
     /// a connection is received.
-    fn send_raw(&mut self, data: Vec<u8>) {
+    fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()> {
         if self.sock.is_none() {
             self.sock = Some(Sock::new(
                 self.listener
