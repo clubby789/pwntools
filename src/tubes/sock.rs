@@ -1,6 +1,6 @@
-use std::io;
 use crate::tubes::buffer::Buffer;
 use crate::tubes::tube::Tube;
+use std::io;
 use std::io::{Read, Write};
 use std::net::{Shutdown, TcpStream};
 use std::time::Duration;
@@ -39,20 +39,17 @@ impl Tube for Sock {
             if read < 1024 {
                 break;
             }
-            }
+        }
         Ok(total)
     }
     /// Send data via the [`Sock`].
     fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()> {
-        self.sock
-            .write_all(&data)
+        self.sock.write_all(&data)
     }
 
     /// Close the internal [`Sock`].
-    fn close(&mut self) {
-        self.sock
-            .shutdown(Shutdown::Both)
-            .expect("Could not shut down socket");
+    fn close(&mut self) -> io::Result<()> {
+        self.sock.shutdown(Shutdown::Both)
     }
 }
 

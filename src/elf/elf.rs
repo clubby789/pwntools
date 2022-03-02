@@ -24,9 +24,13 @@ impl<'a> Elf<'a> {
     /// Create a new [`Elf`] loaded from a path
     pub fn new(path: impl Into<PathBuf>) -> Self {
         let path = path.into();
-        let mapped = Box::new(unsafe {
-            memmap::MmapOptions::new().map(&std::fs::File::open(&path).expect("Could not open file"))
-        }.expect("Could not mmap file"));
+        let mapped = Box::new(
+            unsafe {
+                memmap::MmapOptions::new()
+                    .map(&std::fs::File::open(&path).expect("Could not open file"))
+            }
+            .expect("Could not mmap file"),
+        );
         let mapped = Box::leak(mapped);
         let internal = GoblinElf::parse(mapped).expect("Not a valid ELF file");
         let mut load_address = 0;

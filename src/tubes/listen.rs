@@ -1,7 +1,7 @@
-use std::io;
 use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
+use std::io;
 use std::net::{SocketAddr, TcpListener};
 use std::time::Duration;
 
@@ -22,7 +22,7 @@ pub struct Listen {
 impl Listen {
     /// Create a TCP listener. By default, it will listen on all interfaces, and
     /// a port randomly chosen by the OS.
-    pub fn new<T: ToString>(host: Option<T>, port: Option<i32>) -> Self {
+    pub fn new<T: ToString>(host: Option<T>, port: Option<i32>) -> io::Result<Self> {
         let host = match host {
             Some(h) => h.to_string(),
             None => "0.0.0.0".to_string(),
@@ -32,13 +32,13 @@ impl Listen {
             None => "0".to_string(),
         };
 
-        let listener = TcpListener::bind(format!("{}:{}", host, port)).expect("Could not bind");
-        let addr = listener.local_addr().expect("Could not get sock address");
-        Listen {
+        let listener = TcpListener::bind(format!("{}:{}", host, port))?;
+        let addr = listener.local_addr()?;
+        Ok(Listen {
             listener,
             sock: None,
             addr,
-        }
+        })
     }
 
     /// Retrieve the internal `SocketAddr` of the listener.
@@ -93,9 +93,11 @@ impl Tube for Listen {
     }
 
     /// Close the internal [`Sock`].
-    fn close(&mut self) {
+    fn close(&mut self) -> io::Result<()> {
         if let Some(sock) = &mut self.sock {
-            sock.close();
+            sock.close()
+        } else {
+            Ok(())
         }
     }
 }

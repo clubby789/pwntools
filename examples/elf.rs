@@ -1,4 +1,4 @@
-use pwn::{Elf, log_info};
+use pwn::{log_info, Elf};
 
 fn main() {
     let e = Elf::new("/tmp/binary");

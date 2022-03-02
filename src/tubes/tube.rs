@@ -1,7 +1,7 @@
 extern crate rustyline;
 
-use std::io;
 use rustyline::Editor;
+use std::io;
 extern crate crossbeam_utils;
 use crate::logging::*;
 use crate::tubes::buffer::Buffer;
@@ -67,7 +67,7 @@ pub trait Tube {
     }
     fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()>;
     /// Close both ends of the `Tube`.
-    fn close(&mut self);
+    fn close(&mut self) -> io::Result<()>;
 
     /// Receive until the given delimiter is received.
     fn recvuntil(&mut self, delim: &[u8]) -> io::Result<Vec<u8>> {
@@ -95,13 +95,18 @@ pub trait Tube {
         // Make sure that the receiver thread does not outlive scope
         thread::scope(|s| {
             s.spawn(|_| loop {
-                print!("{}", std::str::from_utf8(&receiver.clean(None).unwrap_or(vec![])).unwrap());
+                print!(
+                    "{}",
+                    std::str::from_utf8(&receiver.clean(None).unwrap_or_default()).unwrap()
+                );
             });
 
             let mut rl = Editor::<()>::new();
             loop {
                 if let Ok(line) = rl.readline("$ ") {
-                    if self.sendline(line).is_err() {return;}
+                    if self.sendline(line).is_err() {
+                        return;
+                    }
                 } else {
                     return;
                 }

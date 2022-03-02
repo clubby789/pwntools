@@ -1,9 +1,9 @@
-use std::io;
 use crate::logging::log;
 use crate::logging::LogLevel::Info;
 use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
+use std::io;
 use std::net::TcpStream;
 use std::time::Duration;
 
@@ -13,7 +13,7 @@ use std::time::Duration;
 /// ```
 /// use pwn::tubes::remote::Remote;
 /// use pwn::tubes::tube::Tube;
-/// let mut sock = Remote::new("tcpbin.com", 4242);
+/// let mut sock = Remote::new("tcpbin.com", 4242).unwrap();
 /// let data = b"test";
 /// sock.sendline(*data);
 /// ```
@@ -26,15 +26,15 @@ pub struct Remote {
 
 impl Remote {
     /// Create a TCP client connection.
-    pub fn new<T: ToString, T2: Into<i32>>(host: T, port: T2) -> Remote {
+    pub fn new<T: ToString, T2: Into<i32>>(host: T, port: T2) -> io::Result<Remote> {
         let port = port.into();
         let conn_str = format!("{}:{}", host.to_string(), port);
         log(format!("Opening connection to {}", conn_str), Info);
-        Remote {
-            sock: Sock::new(TcpStream::connect(conn_str).expect("Could not connect")),
+        Ok(Remote {
+            sock: Sock::new(TcpStream::connect(conn_str)?),
             _host: host.to_string(),
             _port: port,
-        }
+        })
     }
 }
 
@@ -52,7 +52,7 @@ impl Tube for Remote {
         self.sock.send(data)
     }
     /// Close the internal [`Sock`].
-    fn close(&mut self) {
-        self.sock.close();
+    fn close(&mut self) -> io::Result<()> {
+        self.sock.close()
     }
 }
