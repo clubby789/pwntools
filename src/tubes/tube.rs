@@ -2,6 +2,8 @@ extern crate rustyline;
 
 use rustyline::Editor;
 use std::io;
+use std::io::Write;
+
 extern crate crossbeam_utils;
 use crate::logging::*;
 use crate::tubes::buffer::Buffer;
@@ -95,10 +97,9 @@ pub trait Tube {
         // Make sure that the receiver thread does not outlive scope
         thread::scope(|s| {
             s.spawn(|_| loop {
-                print!(
-                    "{}",
-                    std::str::from_utf8(&receiver.clean(None).unwrap_or_default()).unwrap()
-                );
+                std::io::stdout()
+                    .write_all(&receiver.clean(None).unwrap_or_default())
+                    .expect("Couldn't write stdout")
             });
 
             let mut rl = Editor::<()>::new();
@@ -112,7 +113,7 @@ pub trait Tube {
                 }
             }
         })
-        .unwrap();
+        .expect("Couldn't start receiving thread");
         Ok(())
     }
 }

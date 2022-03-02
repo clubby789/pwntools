@@ -1,6 +1,7 @@
 use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
+use once_cell::sync::OnceCell;
 use std::io;
 use std::net::{SocketAddr, TcpListener};
 use std::time::Duration;
@@ -15,7 +16,7 @@ use std::time::Duration;
 /// ```
 pub struct Listen {
     listener: TcpListener,
-    sock: Option<Sock>,
+    sock: OnceCell<Sock>,
     pub addr: SocketAddr,
 }
 
@@ -36,7 +37,7 @@ impl Listen {
         let addr = listener.local_addr()?;
         Ok(Listen {
             listener,
-            sock: None,
+            sock: OnceCell::new(),
             addr,
         })
     }
@@ -47,54 +48,42 @@ impl Listen {
             .local_addr()
             .expect("Could not get bound address")
     }
+
+    fn sock(&mut self) -> io::Result<&Sock> {
+        self.sock
+            .get_or_try_init::<_, io::Error>(|| Ok(Sock::new(self.listener.accept()?.0)))
+    }
+
+    fn sock_mut(&mut self) -> io::Result<&mut Sock> {
+        self.sock()?;
+        // Safe to unwrap, because we hold an exclusive
+        // reference to `self`, and have just done a get_or_init call
+        Ok(self.sock.get_mut().unwrap())
+    }
 }
 
 impl Tube for Listen {
     /// Retrieve a mutable reference to the [`Sock`]'s internal [`Buffer`]. On first call,
     /// will block until a connection is received.
     fn get_buffer(&mut self) -> &mut Buffer {
-        if self.sock.is_none() {
-            self.sock = Some(Sock::new(
-                self.listener
-                    .accept()
-                    .expect("Could not accept connection")
-                    .0,
-            ));
-        }
-        self.sock.as_mut().unwrap().get_buffer()
+        self.sock_mut().unwrap().get_buffer()
     }
 
     /// Fill the [`Sock`]'s internal [`Buffer`]. On first call, will block until
     /// a connection is received.
     fn fill_buffer(&mut self, timeout: Option<Duration>) -> io::Result<usize> {
-        if self.sock.is_none() {
-            self.sock = Some(Sock::new(
-                self.listener
-                    .accept()
-                    .expect("Could not accept connection")
-                    .0,
-            ));
-        }
-        self.sock.as_mut().unwrap().fill_buffer(timeout)
+        self.sock_mut()?.fill_buffer(timeout)
     }
 
     /// Send a message via the [`Sock`]. On first call, will block until
     /// a connection is received.
     fn send_raw(&mut self, data: Vec<u8>) -> io::Result<()> {
-        if self.sock.is_none() {
-            self.sock = Some(Sock::new(
-                self.listener
-                    .accept()
-                    .expect("Could not accept connection")
-                    .0,
-            ));
-        }
-        self.sock.as_mut().unwrap().send(data)
+        self.sock_mut()?.send(data)
     }
 
     /// Close the internal [`Sock`].
     fn close(&mut self) -> io::Result<()> {
-        if let Some(sock) = &mut self.sock {
+        if let Ok(sock) = self.sock_mut().as_mut() {
             sock.close()
         } else {
             Ok(())
