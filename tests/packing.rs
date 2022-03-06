@@ -43,8 +43,18 @@ pub fn test_unpacking_big() {
 pub fn test_multi_threading() {
     use std::thread;
     // Ensure that thread-local contexts work
-    let handles = [test_packing_little, test_packing_big, test_unpacking_little, test_unpacking_big].map(|f| {
-        thread::spawn(move || for _ in 0..100 {f()})
+    let handles = [
+        test_packing_little,
+        test_packing_big,
+        test_unpacking_little,
+        test_unpacking_big,
+    ]
+    .map(|f| {
+        thread::spawn(move || {
+            for _ in 0..100 {
+                f()
+            }
+        })
     });
     for h in handles {
         h.join().unwrap();

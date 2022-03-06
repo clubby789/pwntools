@@ -32,7 +32,15 @@ impl<'a> Elf<'a> {
             .expect("Could not mmap file"),
         );
         let mapped = Box::leak(mapped);
-        let internal = GoblinElf::parse(mapped).expect("Not a valid ELF file");
+        Self::construct(path, mapped)
+    }
+    /// Create a new [`Elf`] from an array of raw bytes
+    /// The path will be set to an empty string
+    pub fn from_bytes(bytes: &'a [u8]) -> Self {
+        Self::construct("".into(), bytes)
+    }
+    fn construct(path: PathBuf, bytes: &'a [u8]) -> Self {
+        let internal = GoblinElf::parse(bytes).expect("Not a valid ELF file");
         let mut load_address = 0;
         if internal.header.e_type != ET_DYN {
             internal
@@ -65,7 +73,6 @@ impl<'a> Elf<'a> {
             address: load_address as usize,
         }
     }
-
     /// The path the ELF file was originally loaded from
     pub fn path(&self) -> &PathBuf {
         &self.path

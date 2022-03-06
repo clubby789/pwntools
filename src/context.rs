@@ -76,19 +76,35 @@ thread_local! {
 
 // Setters
 /// Set the context's architecture
-pub fn set_arch(a: Arch) {CONTEXT.with(|c| c.borrow_mut().arch = a)}
+pub fn set_arch(a: Arch) {
+    CONTEXT.with(|c| c.borrow_mut().arch = a)
+}
 /// Set the context's log-level
-pub fn set_loglevel(l: LogLevel) {CONTEXT.with(|c| c.borrow_mut().log_level = l)}
+pub fn set_loglevel(l: LogLevel) {
+    CONTEXT.with(|c| c.borrow_mut().log_level = l)
+}
 /// Set the context's endianess
-pub fn set_endianess(e: Endianness) {CONTEXT.with(|c| c.borrow_mut().arch.endian = e)}
+pub fn set_endianess(e: Endianness) {
+    CONTEXT.with(|c| c.borrow_mut().arch.endian = e)
+}
 /// Set the context's word size
-pub fn set_bits(b: Bits) {CONTEXT.with(|c| c.borrow_mut().arch.bits = b)}
+pub fn set_bits(b: Bits) {
+    CONTEXT.with(|c| c.borrow_mut().arch.bits = b)
+}
 // Getters
 /// Get the context's architecture
-pub fn get_arch() -> Arch {CONTEXT.with(|c| c.borrow().arch)}
+pub fn get_arch() -> Arch {
+    CONTEXT.with(|c| c.borrow().arch)
+}
 /// Get the context's log-level
-pub fn get_loglevel() -> LogLevel {CONTEXT.with(|c| c.borrow().log_level)}
+pub fn get_loglevel() -> LogLevel {
+    CONTEXT.with(|c| c.borrow().log_level)
+}
 /// Get the context's endianess
-pub fn get_endianess() -> Endianness {CONTEXT.with(|c| c.borrow().arch.endian)}
+pub fn get_endianess() -> Endianness {
+    CONTEXT.with(|c| c.borrow().arch.endian)
+}
 /// Get the context's word size
-pub fn get_bits() -> Bits {CONTEXT.with(|c| c.borrow().arch.bits)}
+pub fn get_bits() -> Bits {
+    CONTEXT.with(|c| c.borrow().arch.bits)
+}
