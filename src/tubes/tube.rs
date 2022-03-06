@@ -25,11 +25,8 @@ pub trait Tube {
     /// * `timeout` - The maximum time to read for, defaults to 0.05s. If 0, clean only the
     /// internal buffer.
     fn clean(&mut self, timeout: Option<Duration>) -> io::Result<Vec<u8>> {
-        let timeout = match timeout {
-            Some(t) => t,
-            None => Duration::from_millis(100),
-        };
-        if timeout == Duration::from_millis(0) {
+        let timeout = timeout.unwrap_or_else(|| Duration::from_millis(0));
+        if timeout.is_zero() {
             return Ok(self.get_buffer().get(0));
         }
         self.recvrepeat(Some(timeout))
