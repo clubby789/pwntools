@@ -25,7 +25,6 @@ pub enum Bits {
     Sixteen = 16,
     ThirtyTwo = 32,
     SixtyFour = 64,
-    OneTwentyEight = 128,
 }
 
 /// An architecture, identified by its endianness and word size
