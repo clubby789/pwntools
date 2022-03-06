@@ -14,7 +14,7 @@ pub fn p8(v: u8) -> Vec<u8> {
 
 /// Packs a `u16` to a 2-byte `Vec`
 pub fn p16(v: u16) -> Vec<u8> {
-    let mut res = Vec::<u8>::new();
+    let mut res: Vec<u8> = std::iter::repeat(0).take(2).collect();
     match context::get_endianess() {
         Big => BigEndian::write_u16(&mut res, v),
         Little => LittleEndian::write_u16(&mut res, v),
@@ -24,7 +24,7 @@ pub fn p16(v: u16) -> Vec<u8> {
 
 /// Packs a `u32` to a 4-byte `Vec`
 pub fn p32(v: u32) -> Vec<u8> {
-    let mut res = Vec::<u8>::new();
+    let mut res: Vec<u8> = std::iter::repeat(0).take(4).collect();
     match context::get_endianess() {
         Big => BigEndian::write_u32(&mut res, v),
         Little => LittleEndian::write_u32(&mut res, v),
@@ -34,7 +34,7 @@ pub fn p32(v: u32) -> Vec<u8> {
 
 /// Packs a `u64` to an 8-byte `Vec`
 pub fn p64(v: u64) -> Vec<u8> {
-    let mut res = Vec::<u8>::new();
+    let mut res: Vec<u8> = std::iter::repeat(0).take(8).collect();
     match context::get_endianess() {
         Big => BigEndian::write_u64(&mut res, v),
         Little => LittleEndian::write_u64(&mut res, v),
@@ -111,6 +111,6 @@ pub fn unpack(v: &[u8]) -> u64 {
         Bits::Eight => u8(v) as u64,
         Bits::Sixteen => u16(v) as u64,
         Bits::ThirtyTwo => u32(v) as u64,
-        Bits::SixtyFour => u64(v)
+        Bits::SixtyFour => u64(v),
     }
 }

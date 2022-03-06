@@ -24,12 +24,9 @@ pub trait Tube {
     ///
     /// * `timeout` - The maximum time to read for, defaults to 0.05s. If 0, clean only the
     /// internal buffer.
-    fn clean(&mut self, timeout: Option<Duration>) -> io::Result<Vec<u8>> {
-        let timeout = timeout.unwrap_or_else(|| Duration::from_millis(0));
-        if timeout.is_zero() {
-            return Ok(self.get_buffer().get(0));
-        }
-        self.recvrepeat(Some(timeout))
+    fn clean(&mut self, timeout: Duration) -> io::Result<Vec<u8>> {
+        self.fill_buffer(Some(timeout))?;
+        Ok(self.get_buffer().get(0))
     }
 
     /// Receives from the `Tube`, returning once any data is available.
@@ -98,7 +95,11 @@ pub trait Tube {
         thread::scope(|s| {
             s.spawn(|_| loop {
                 std::io::stdout()
-                    .write_all(&receiver.clean(None).unwrap_or_default())
+                    .write_all(
+                        &receiver
+                            .clean(Duration::from_millis(50))
+                            .unwrap_or_default(),
+                    )
                     .expect("Couldn't write stdout")
             });
 
