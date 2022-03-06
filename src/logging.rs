@@ -1,5 +1,5 @@
 //! A collection of logging utilities.
-use crate::context::context;
+use crate::context;
 use std::fmt::Display;
 
 use colored::{ColoredString, Colorize};
@@ -28,7 +28,7 @@ pub enum LogLevel {
 /// log("Something went wrong", LogLevel::Error);
 /// ```
 pub fn log<T: Display>(message: T, level: LogLevel) {
-    if level < context().log_level {
+    if level < context::get_loglevel() {
         return;
     }
     let log_char = match level {

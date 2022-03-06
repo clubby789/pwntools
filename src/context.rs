@@ -1,12 +1,12 @@
 //! The global context. Used to set global settings which are used internally by several functions.
 #![allow(dead_code)]
+
 use crate::context::Bits::{SixtyFour, ThirtyTwo};
 use crate::context::Endianness::Little;
 use crate::logging::LogLevel;
 use crate::logging::LogLevel::Info;
 
-use once_cell::sync::Lazy;
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::cell::RefCell;
 
 /// The word endianness of a given [`Arch`]
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -53,10 +53,8 @@ pub const I386: Arch = Arch {
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[allow(missing_docs)]
 pub struct Context {
-    pub arch: Arch,
-    pub log_level: LogLevel,
-    pub endian: Endianness,
-    pub bits: Bits,
+    arch: Arch,
+    log_level: LogLevel,
 }
 
 impl Default for Context {
@@ -64,35 +62,33 @@ impl Default for Context {
         Self {
             arch: I386,
             log_level: Info,
-            endian: Little,
-            bits: ThirtyTwo,
         }
     }
 }
 
-/** The default `Context`.
-* Arch: [`I386`],
-* Log Level: [`Info`],
-* Endianness: [`Little`],
-*  Bits: [`ThirtyTwo`]
-**/
-pub static CONTEXT: Lazy<RwLock<Context>> = Lazy::new(|| RwLock::new(Default::default()));
-
-/// Retrieves a static reference to the global `Context`.
-pub fn context() -> RwLockReadGuard<'static, Context> {
-    CONTEXT.read().unwrap()
+thread_local! {
+    /** The default `Context`.
+    * Arch: [`I386`],
+    * Log Level: [`Info`]
+     **/
+    static CONTEXT: RefCell<Context> = Default::default();
 }
 
-/// Retrieves a mutable static reference to the global `Context`.
-pub fn context_mut() -> RwLockWriteGuard<'static, Context> {
-    CONTEXT.write().unwrap()
-}
-
-impl Context {
-    /// Set the context's architecture and update the bits/endianness correspondingly
-    pub fn set_arch(&mut self, a: Arch) {
-        self.arch = a;
-        self.bits = a.bits;
-        self.endian = a.endian;
-    }
-}
+// Setters
+/// Set the context's architecture
+pub fn set_arch(a: Arch) {CONTEXT.with(|c| c.borrow_mut().arch = a)}
+/// Set the context's log-level
+pub fn set_loglevel(l: LogLevel) {CONTEXT.with(|c| c.borrow_mut().log_level = l)}
+/// Set the context's endianess
+pub fn set_endianess(e: Endianness) {CONTEXT.with(|c| c.borrow_mut().arch.endian = e)}
+/// Set the context's word size
+pub fn set_bits(b: Bits) {CONTEXT.with(|c| c.borrow_mut().arch.bits = b)}
+// Getters
+/// Get the context's architecture
+pub fn get_arch() -> Arch {CONTEXT.with(|c| c.borrow().arch)}
+/// Get the context's log-level
+pub fn get_loglevel() -> LogLevel {CONTEXT.with(|c| c.borrow().log_level)}
+/// Get the context's endianess
+pub fn get_endianess() -> Endianness {CONTEXT.with(|c| c.borrow().arch.endian)}
+/// Get the context's word size
+pub fn get_bits() -> Bits {CONTEXT.with(|c| c.borrow().arch.bits)}
