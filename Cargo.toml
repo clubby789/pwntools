@@ -1,6 +1,6 @@
 [package]
 name = "pwn"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["clubby789 <jamie@hill-daniel.co.uk>"]
 description = "An implementation of Pwntools written in Rust."
 edition = "2018"
