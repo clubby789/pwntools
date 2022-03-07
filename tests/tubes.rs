@@ -25,6 +25,7 @@ fn listen_sock() {
     let mut listener = Listen::new(Some("0.0.0.0"), None).unwrap();
     let addr = listener.addr;
     std::thread::spawn(move || {
+        context::set_loglevel(Silent);
         std::thread::sleep(Duration::from_secs(1));
         let mut sock = Remote::new("127.0.0.1", addr.port()).unwrap();
         sock.send(*b"test").unwrap();
