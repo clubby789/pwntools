@@ -1,4 +1,14 @@
-//! The global context. Used to set global settings which are used internally by several functions.
+//! The global (to a given thread) context. Used to set global settings which are used internally by several functions.
+//! # Examples
+//! ```
+//! use pwn::{context, I386};
+//! use pwn::Bits::ThirtyTwo;
+//! context::set_arch(I386);
+//! assert_eq!(context::get_arch(), I386);
+//! assert_eq!(context::get_bits(), ThirtyTwo)
+//! ```
+//! # Warning
+//! `context` is local to each thread. Context values may need to be re-set when using multi-threaded code.
 #![allow(dead_code)]
 
 use crate::context::Bits::{SixtyFour, ThirtyTwo};
