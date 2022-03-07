@@ -1,11 +1,14 @@
+use pwn::context;
 use pwn::tubes::listen::Listen;
 use pwn::tubes::remote::Remote;
 use pwn::tubes::tube::Tube;
+use pwn::LogLevel::Silent;
 use std::time::Duration;
 
 /// Test ability to write to a TCP echo server and read the result.
 #[test]
 fn echo_sock() {
+    context::set_loglevel(Silent);
     // TCP echo server
     let mut sock = Remote::new("tcpbin.com", 4242).unwrap();
     let data = b"test";
@@ -15,9 +18,10 @@ fn echo_sock() {
     assert_eq!(returned[..4], data[..])
 }
 
-/// Test opening a listening socket and sending data to it
+/// Test opening a listening socket and sending data to it.
 #[test]
 fn listen_sock() {
+    context::set_loglevel(Silent);
     let mut listener = Listen::new(Some("0.0.0.0"), None).unwrap();
     let addr = listener.addr;
     std::thread::spawn(move || {

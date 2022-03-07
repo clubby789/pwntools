@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use colored::{ColoredString, Colorize};
 
-/// Iterative log levels for filtering
+/// Iterative log levels for filtering.
 #[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
 #[repr(u8)]
 #[allow(missing_docs)]
@@ -48,22 +48,22 @@ fn log_message<T: Display>(message: T, char: Option<ColoredString>) {
     }
 }
 
-/// Log a debug message
+/// Log a debug message.
 pub fn log_debug<T: Display>(message: T) {
     log(message, LogLevel::Debug);
 }
 
-/// Log an info message
+/// Log an info message.
 pub fn log_info<T: Display>(message: T) {
     log(message, LogLevel::Info);
 }
 
-/// Log a warning
+/// Log a warning.
 pub fn log_warn<T: Display>(message: T) {
     log(message, LogLevel::Warn);
 }
 
-/// Log an error
+/// Log an error.
 pub fn log_err<T: Display>(message: T) {
     log(message, LogLevel::Error);
 }

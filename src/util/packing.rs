@@ -4,15 +4,13 @@ use crate::context::{
 };
 use crate::Bits;
 use byteorder::{BigEndian, ByteOrder, LittleEndian};
-use std::convert::TryInto;
-use std::num::TryFromIntError;
 
-/// Packs a `u8` to a 1-byte `Vec`
+/// Packs a `u8` to a 1-byte `Vec`.
 pub fn p8(v: u8) -> Vec<u8> {
     vec![v]
 }
 
-/// Packs a `u16` to a 2-byte `Vec`
+/// Packs a `u16` to a 2-byte `Vec`.
 pub fn p16(v: u16) -> Vec<u8> {
     let mut res: Vec<u8> = std::iter::repeat(0).take(2).collect();
     match context::get_endianess() {
@@ -22,7 +20,7 @@ pub fn p16(v: u16) -> Vec<u8> {
     res
 }
 
-/// Packs a `u32` to a 4-byte `Vec`
+/// Packs a `u32` to a 4-byte `Vec`.
 pub fn p32(v: u32) -> Vec<u8> {
     let mut res: Vec<u8> = std::iter::repeat(0).take(4).collect();
     match context::get_endianess() {
@@ -32,7 +30,7 @@ pub fn p32(v: u32) -> Vec<u8> {
     res
 }
 
-/// Packs a `u64` to an 8-byte `Vec`
+/// Packs a `u64` to an 8-byte `Vec`.
 pub fn p64(v: u64) -> Vec<u8> {
     let mut res: Vec<u8> = std::iter::repeat(0).take(8).collect();
     match context::get_endianess() {
@@ -42,20 +40,20 @@ pub fn p64(v: u64) -> Vec<u8> {
     res
 }
 
-/// Unpacks a 1 byte `Vec` to a `u8`
+/// Unpacks a 1 byte `Vec` to a `u8`.
 ///
 /// # Panics
 ///
-/// Panics when `v.len() < 1`
+/// Panics when `v.len() < 1`.
 pub fn u8(v: &[u8]) -> u8 {
     v[0]
 }
 
-/// Unpacks a 2 byte `Vec` to a `u16`
+/// Unpacks a 2 byte `Vec` to a `u16`.
 ///
 /// # Panics
 ///
-/// Panics when `v.len() < 2`
+/// Panics when `v.len() < 2`.
 pub fn u16(v: &[u8]) -> u16 {
     match context::get_endianess() {
         Big => BigEndian::read_u16(v),
@@ -63,11 +61,11 @@ pub fn u16(v: &[u8]) -> u16 {
     }
 }
 
-/// Unpacks a 4 byte `Vec` to a `u32`
+/// Unpacks a 4 byte `Vec` to a `u32`.
 ///
 /// # Panics
 ///
-/// Panics when `v.len() < 4`
+/// Panics when `v.len() < 4`.
 pub fn u32(v: &[u8]) -> u32 {
     match context::get_endianess() {
         Big => BigEndian::read_u32(v),
@@ -75,11 +73,11 @@ pub fn u32(v: &[u8]) -> u32 {
     }
 }
 
-/// Unpacks an 8 byte `Vec` to a `u64`
+/// Unpacks an 8 byte `Vec` to a `u64`.
 ///
 /// # Panics
 ///
-/// Panics when `v.len() < 8`
+/// Panics when `v.len() < 8`.
 pub fn u64(v: &[u8]) -> u64 {
     match context::get_endianess() {
         Big => BigEndian::read_u64(v),
@@ -87,25 +85,21 @@ pub fn u64(v: &[u8]) -> u64 {
     }
 }
 
-/// Automatically packs an integer in a [`pwn::context`] sensitive way
-/// Returns an error if the passed integer is too large to be casted down
-pub fn pack<T>(v: T) -> Result<Vec<u8>, TryFromIntError>
+/// Automatically packs an integer in a [`context`] sensitive way.
+/// Returns `None` if the passed integer is too large to be casted down.
+pub fn pack<T>(v: T) -> Option<Vec<u8>>
 where
-    T: TryInto<u8> + TryInto<u16> + TryInto<u32> + TryInto<u64>,
-    TryFromIntError: From<<T as TryInto<u8>>::Error>,
-    TryFromIntError: From<<T as TryInto<u16>>::Error>,
-    TryFromIntError: From<<T as TryInto<u32>>::Error>,
-    TryFromIntError: From<<T as TryInto<u64>>::Error>,
+    T: num_traits::ToPrimitive,
 {
     match context::get_bits() {
-        Bits::Eight => Ok(p8(v.try_into()?)),
-        Bits::Sixteen => Ok(p16(v.try_into()?)),
-        Bits::ThirtyTwo => Ok(p32(v.try_into()?)),
-        Bits::SixtyFour => Ok(p64(v.try_into()?)),
+        Bits::Eight => Some(p8(v.to_u8()?)),
+        Bits::Sixteen => Some(p16(v.to_u16()?)),
+        Bits::ThirtyTwo => Some(p32(v.to_u32()?)),
+        Bits::SixtyFour => Some(p64(v.to_u64()?)),
     }
 }
 
-/// Automatically unpacks a buffer to an integer in a [`pwn::context`] sensitive way
+/// Automatically unpacks a buffer to an integer in a [`context`] sensitive way.
 pub fn unpack(v: &[u8]) -> u64 {
     match context::get_bits() {
         Bits::Eight => u8(v) as u64,
