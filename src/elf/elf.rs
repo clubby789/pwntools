@@ -16,7 +16,6 @@ pub struct Elf<'a> {
     got: OnceCell<HashMap<&'a str, usize>>,
     plt: OnceCell<HashMap<&'a str, usize>>,
     statically_linked: bool,
-    #[allow(dead_code)]
     address: usize,
 }
 
@@ -187,5 +186,35 @@ impl<'a> Elf<'a> {
             }
         }
         plt
+    }
+    /// The address the ELF is loaded at (may be 0 for a relocatable ELF).
+    pub fn address(&self) -> usize {
+        self.address
+    }
+    /// Set the ELF's load address, rebasing all values.
+    pub fn set_address(&mut self, address: usize) -> usize {
+        let delta = address as i64 - self.address as i64;
+        self.address = address;
+        // Ensure each map is initialized
+        self.symbols();
+        self.symbols
+            .get_mut()
+            .unwrap()
+            .iter_mut()
+            .for_each(|(_, v)| {
+                let tmp = *v as i64;
+                *v = (tmp + delta) as usize
+            });
+        self.got();
+        self.got.get_mut().unwrap().iter_mut().for_each(|(_, v)| {
+            let tmp = *v as i64;
+            *v = (tmp + delta) as usize
+        });
+        self.plt();
+        self.plt.get_mut().unwrap().iter_mut().for_each(|(_, v)| {
+            let tmp = *v as i64;
+            *v = (tmp + delta) as usize
+        });
+        address
     }
 }

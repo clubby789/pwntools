@@ -2,7 +2,8 @@ use pwn::Elf;
 
 #[test]
 fn test_elf() {
-    let elf = Elf::from_bytes(res::ELF);
+    let mut elf = Elf::from_bytes(res::ELF);
+    assert_eq!(elf.address(), 0);
     let got = [
         ("__libc_start_main", 16344),
         ("_ITM_deregisterTMCloneTable", 16352),
@@ -53,6 +54,10 @@ fn test_elf() {
     syms.iter().for_each(|(sym, addr)| {
         assert_eq!(elf.symbols().get(sym).unwrap(), addr);
     });
+
+    elf.set_address(0x5000);
+    assert_eq!(elf.address(), 0x5000);
+    assert_eq!(*elf.symbols().get("puts").unwrap(), 0x5000+4144);
 }
 
 mod res {

@@ -1,4 +1,4 @@
-use crate::{pack};
+use crate::pack;
 use duplicate::duplicate_item;
 
 /// Flatten an item into bytes in a [`crate::context`]-aware way.
