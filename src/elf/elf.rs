@@ -8,7 +8,7 @@ use goblin::elf::section_header::SHN_UNDEF;
 use goblin::elf::Elf as GoblinElf;
 use once_cell::sync::OnceCell;
 
-/// Wrapper around [`goblin::elf::Elf`]
+/// Wrapper around [`goblin::elf::Elf`].
 pub struct Elf<'a> {
     path: PathBuf,
     elf: GoblinElf<'a>,
@@ -21,7 +21,7 @@ pub struct Elf<'a> {
 }
 
 impl<'a> Elf<'a> {
-    /// Create a new [`Elf`] loaded from a path
+    /// Create a new [`Elf`] which is loaded from the given path.
     pub fn new(path: impl Into<PathBuf>) -> Self {
         let path = path.into();
         let mapped = Box::new(
@@ -34,8 +34,8 @@ impl<'a> Elf<'a> {
         let mapped = Box::leak(mapped);
         Self::construct(path, mapped)
     }
-    /// Create a new [`Elf`] from an array of raw bytes
-    /// The path will be set to an empty string
+    /// Create a new [`Elf`] from an array of raw bytes.
+    /// The [`Elf::path`] will be set to an empty string.
     pub fn from_bytes(bytes: &'a [u8]) -> Self {
         Self::construct("".into(), bytes)
     }
@@ -73,11 +73,11 @@ impl<'a> Elf<'a> {
             address: load_address as usize,
         }
     }
-    /// The path the ELF file was originally loaded from
+    /// The path the ELF file was originally loaded from.
     pub fn path(&self) -> &PathBuf {
         &self.path
     }
-    /// The word size of the ELF file
+    /// The word size of the ELF file.
     pub fn bits(&self) -> usize {
         if self.elf.is_64 {
             64
@@ -86,7 +86,7 @@ impl<'a> Elf<'a> {
         }
     }
 
-    /// A name->address mapping of the symbols in the ELF
+    /// A name->address mapping of the symbols in the ELF.
     pub fn symbols(&self) -> &HashMap<&'a str, usize> {
         self.symbols.get_or_init(|| self.populate_symbols())
     }
@@ -126,7 +126,7 @@ impl<'a> Elf<'a> {
         syms
     }
 
-    /// A name->address mapping of the GOT entries in the ELF
+    /// A name->address mapping of the GOT entries in the ELF.
     pub fn got(&self) -> &HashMap<&'a str, usize> {
         self.got.get_or_init(|| self.populate_got())
     }
@@ -159,7 +159,7 @@ impl<'a> Elf<'a> {
         got
     }
 
-    /// A name->address mapping of the PLT entries in the ELF
+    /// A name->address mapping of the PLT entries in the ELF.
     pub fn plt(&self) -> &HashMap<&'a str, usize> {
         self.plt.get_or_init(|| self.populate_plt())
     }

@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
-/// List of strings with some helper routines.
+/// Collection of bytes with some helper routines.
 ///
-/// Used as the backing store for the `Tube` structs
+/// Used as the backing store for the `Tube` structs.
 #[derive(Clone)]
 pub struct Buffer {
     /// A queue of `u8` (oldest is at the start)
@@ -18,22 +18,22 @@ impl Default for Buffer {
 }
 
 impl Buffer {
-    /// Initialize a `Buffer`
+    /// Initialize a `Buffer`.
     pub fn new() -> Self {
         Self {
             data: VecDeque::<u8>::new(),
             size: 0,
         }
     }
-    /// Get the current `Buffer` length
+    /// Get the current `Buffer` length.
     pub fn len(&self) -> usize {
         self.size
     }
-    /// Check if `Buffer` is empty
+    /// Check if `Buffer` is empty.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    /// Adds new data to the buffer
+    /// Adds new data to the buffer.
     pub fn add(&mut self, data: Vec<u8>) {
         // TODO: Allow adding another buffer
         self.size += data.len();

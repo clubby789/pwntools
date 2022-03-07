@@ -10,7 +10,7 @@ use crate::tubes::buffer::Buffer;
 use crossbeam_utils::thread;
 use std::time::Duration;
 
-/// Generic `Tube` trait
+/// Generic `Tube` trait, used as the underlying interface for IO.
 pub trait Tube {
     /// Retrieve mutable reference to the internal [`Buffer`].
     fn get_buffer(&mut self) -> &mut Buffer;

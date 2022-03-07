@@ -1,6 +1,11 @@
-//! An implementation of [Pwntools](https://github.com/Gallopsled/pwntools/) written in Rust
+//! An implementation of [Pwntools](https://github.com/Gallopsled/pwntools/) written in Rust.
 //!
 //! Pwntools is a collection of tools and utilities designed to assist with a variety of exploitation.
+//!
+//! ```
+//! use pwn::*;
+//! log_info("Hello, world!");
+//! ```
 #![warn(missing_docs)]
 
 pub mod context;
