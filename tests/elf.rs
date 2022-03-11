@@ -57,7 +57,7 @@ fn test_elf() {
 
     elf.set_address(0x5000);
     assert_eq!(elf.address(), 0x5000);
-    assert_eq!(*elf.symbols().get("puts").unwrap(), 0x5000+4144);
+    assert_eq!(*elf.symbols().get("puts").unwrap(), 0x5000 + 4144);
 }
 
 mod res {
