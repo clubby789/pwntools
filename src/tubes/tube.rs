@@ -5,7 +5,7 @@ use std::io;
 use std::io::Write;
 
 extern crate crossbeam_utils;
-use crate::logging::*;
+use crate::debug;
 use crate::tubes::buffer::Buffer;
 use crossbeam_utils::thread;
 use std::time::Duration;
@@ -52,14 +52,14 @@ pub trait Tube {
     /// Writes data to the `Tube`.
     fn send<T: Into<Vec<u8>>>(&mut self, data: T) -> io::Result<()> {
         let data = data.into();
-        log_debug(format!("Sending {} bytes", data.len()));
+        debug!("Sending {} bytes", data.len());
         self.send_raw(data)
     }
     /// Appends a newline to the data before writing it to the `Tube`.
     fn sendline<T: Into<Vec<u8>>>(&mut self, data: T) -> io::Result<()> {
         let mut data = data.into();
         data.push(b'\n');
-        log_debug(format!("Sending {} bytes", data.len()));
+        debug!("Sending {} bytes", data.len());
         self.send_raw(data)
     }
 

@@ -1,5 +1,4 @@
-use crate::logging::log;
-use crate::logging::LogLevel::Info;
+use crate::info;
 use crate::tubes::buffer::Buffer;
 use crate::tubes::sock::Sock;
 use crate::tubes::tube::Tube;
@@ -29,7 +28,7 @@ impl Remote {
     pub fn new<T: ToString, T2: Into<i32>>(host: T, port: T2) -> io::Result<Remote> {
         let port = port.into();
         let conn_str = format!("{}:{}", host.to_string(), port);
-        log(format!("Opening connection to {}", conn_str), Info);
+        info!("Opening connection to {}", conn_str);
         Ok(Remote {
             sock: Sock::new(TcpStream::connect(conn_str)?),
             _host: host.to_string(),

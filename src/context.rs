@@ -13,8 +13,6 @@
 
 use crate::context::Bits::{SixtyFour, ThirtyTwo};
 use crate::context::Endianness::Little;
-use crate::logging::LogLevel;
-use crate::logging::LogLevel::Info;
 
 use std::cell::RefCell;
 
@@ -63,15 +61,11 @@ pub const I386: Arch = Arch {
 #[allow(missing_docs)]
 pub struct Context {
     arch: Arch,
-    log_level: LogLevel,
 }
 
 impl Default for Context {
     fn default() -> Self {
-        Self {
-            arch: I386,
-            log_level: Info,
-        }
+        Self { arch: I386 }
     }
 }
 
@@ -88,10 +82,6 @@ thread_local! {
 pub fn set_arch(a: Arch) {
     CONTEXT.with(|c| c.borrow_mut().arch = a)
 }
-/// Set the context's log-level
-pub fn set_loglevel(l: LogLevel) {
-    CONTEXT.with(|c| c.borrow_mut().log_level = l)
-}
 /// Set the context's endianess
 pub fn set_endianess(e: Endianness) {
     CONTEXT.with(|c| c.borrow_mut().arch.endian = e)
@@ -104,10 +94,6 @@ pub fn set_bits(b: Bits) {
 /// Get the context's architecture
 pub fn get_arch() -> Arch {
     CONTEXT.with(|c| c.borrow().arch)
-}
-/// Get the context's log-level
-pub fn get_loglevel() -> LogLevel {
-    CONTEXT.with(|c| c.borrow().log_level)
 }
 /// Get the context's endianess
 pub fn get_endianess() -> Endianness {

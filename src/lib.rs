@@ -2,17 +2,19 @@
 //!
 //! Pwntools is a collection of tools and utilities designed to assist with a variety of exploitation.
 //!
-//! ```
+//! ```no_run
 //! use pwn::*;
-//! log_info("Hello, world!");
+//! init_logger();
+//! let mut r = Remote::new("127.0.0.1", 1337).unwrap();
+//! info!("Hello, world: {:?}!", r.recv().unwrap());
 //! ```
 #![warn(missing_docs)]
 
-pub mod context;
-pub use context::*;
-
 pub mod logging;
 pub use logging::*;
+
+pub mod context;
+pub use context::*;
 
 #[cfg(feature = "tubes")]
 pub mod tubes;

@@ -1,69 +1,41 @@
-//! A collection of logging utilities.
-use crate::context;
-use std::fmt::Display;
+//! A `tracing_subscriber` log formatter
+//! [`init_logger`] **must** be called in order to use this!
 
-use colored::{ColoredString, Colorize};
+use colored::Colorize;
+pub use tracing::{debug, error, info, warn};
+use tracing::{Event, Level, Subscriber};
+use tracing_subscriber::fmt::format::Writer;
+use tracing_subscriber::fmt::{FmtContext, FormatEvent, FormatFields};
+use tracing_subscriber::registry::LookupSpan;
 
-/// Iterative log levels for filtering.
-#[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
-#[repr(u8)]
-#[allow(missing_docs)]
-pub enum LogLevel {
-    Debug = 0,
-    Info = 1,
-    Warn = 2,
-    Error = 3,
-    Silent = 4,
-}
-
-/// Generic logging function. Will not display logs of below the level specified in the `Context`.
-/// # Arguments
-///
-/// * `message` - The message to be logged
-/// * `level` - The `LogLevel` of the message.
-///
-/// # Examples
-/// ```
-/// use pwn::logging::{log, LogLevel};
-/// log("Something went wrong", LogLevel::Error);
-/// ```
-pub fn log<T: Display>(message: T, level: LogLevel) {
-    if level < context::get_loglevel() {
-        return;
-    }
-    let log_char = match level {
-        LogLevel::Debug => Some("|".purple()),
-        LogLevel::Info => Some("*".blue()),
-        LogLevel::Warn => Some("!".yellow()),
-        LogLevel::Error => Some("X".red()),
-        _ => None,
-    };
-    log_message(message, log_char);
-}
-
-fn log_message<T: Display>(message: T, char: Option<ColoredString>) {
-    match char {
-        Some(c) => println!("[{}] {}", c, message),
-        None => println!("{}", message),
+struct PwnFormatter;
+impl<S, N> FormatEvent<S, N> for PwnFormatter
+where
+    S: Subscriber + for<'a> LookupSpan<'a>,
+    N: for<'a> FormatFields<'a> + 'static,
+{
+    fn format_event(
+        &self,
+        ctx: &FmtContext<'_, S, N>,
+        mut writer: Writer<'_>,
+        event: &Event<'_>,
+    ) -> std::fmt::Result {
+        let meta = event.metadata();
+        let log_char = match *meta.level() {
+            Level::DEBUG => "|".purple(),
+            Level::INFO => "*".blue(),
+            Level::WARN => "!".yellow(),
+            _ => "X".red(),
+        };
+        write!(&mut writer, "[{}] {}: ", log_char, meta.target().green())?;
+        ctx.field_format().format_fields(writer.by_ref(), event)?;
+        writeln!(writer)
     }
 }
 
-/// Log a debug message.
-pub fn log_debug<T: Display>(message: T) {
-    log(message, LogLevel::Debug);
-}
-
-/// Log an info message.
-pub fn log_info<T: Display>(message: T) {
-    log(message, LogLevel::Info);
-}
-
-/// Log a warning.
-pub fn log_warn<T: Display>(message: T) {
-    log(message, LogLevel::Warn);
-}
-
-/// Log an error.
-pub fn log_err<T: Display>(message: T) {
-    log(message, LogLevel::Error);
+/// Initialise the logging subscriber
+pub fn init_logger() {
+    tracing_subscriber::fmt()
+        .event_format(PwnFormatter {})
+        .init();
 }
